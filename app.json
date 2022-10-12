@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "BlackBox",
+    "slug": "BlackBox",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/blackBox.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/blackBox.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.rainwater.rainwater"
+    },
+    "web": {
+      "favicon": "./assets/blackBox.png"
+    }
+  }
+}
