@@ -25,7 +25,9 @@
         "foregroundImage": "./assets/blackBox.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.rainwater.rainwater"
+      "package": "com.rainwater.rainwater",
+      "versionCode": 1,
+      "permissions" : []
     },
     "web": {
       "favicon": "./assets/blackBox.png"

@@ -58,7 +58,7 @@ const Navigation = () => {
   const token = useSelector((state) => state.login.token);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer independent={true}>
       <Stack.Navigator
         initialRouteName="Auth"
         screenOptions={{

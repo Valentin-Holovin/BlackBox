@@ -12,29 +12,32 @@ import { WebView } from "react-native-webview";
 import { DASHBOARD_URL, LOGIN_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
+import { useCallback } from "react";
 
 const DashboardScreen = ({ navigation, userName, password }) => {
   const [canGoBack, setCanGoBack] = useState(false);
   const [url, setUrl] = useState(DASHBOARD_URL);
   const ref = useRef(null);
 
-  React.useEffect(() => {
-    const handler = () => {
-      ref.current.goBack();
-      return true;
-    };
-    BackHandler.addEventListener("hardwareBackPress", handler);
-    navigation.closeDrawer();
-    return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handler);
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const handler = () => {
+        ref.current.goBack();
+        return true;
+      };
+      BackHandler.addEventListener("hardwareBackPress", handler);
+      navigation.closeDrawer();
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handler);
+      };
+    }, [])
+  );
 
   const [isPostsLoading, setIsPostsLoading] = useState(false);
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       if (ref.current) {
         setUrl(DASHBOARD_URL);
         ref.current.reload();
@@ -139,6 +142,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   };
 
   const onNavigationStateChange = (navState) => {
+    console.log("navState", navState);
     setIsPostsLoading(true);
     if (navState.url == LOGIN_URL) {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
