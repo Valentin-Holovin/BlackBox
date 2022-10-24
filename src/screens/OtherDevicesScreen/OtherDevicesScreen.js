@@ -69,14 +69,14 @@ const OtherDevicesScreen = ({ navigation, userName, password }) => {
     }
   };
 
-  const onNavigationStateChange = (navState) => {
-    setIsPostsLoading(true);
-    if (navState.url == LOGIN_URL) {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-    } else {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }
-  };
+  // const onNavigationStateChange = (navState) => {
+  //   setIsPostsLoading(true);
+  //   if (navState.url == LOGIN_URL) {
+  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
+  //   } else {
+  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+  //   }
+  // };
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
@@ -107,10 +107,10 @@ const OtherDevicesScreen = ({ navigation, userName, password }) => {
       <View>
         <View style={styles.webview}>
           <WebView
+            injectedJavaScript={INJECTED_JAVASCRIPT}
             nestedScrollEnabled={true}
             source={{ uri: DEVICES_URL }}
             ref={ref}
-            onNavigationStateChange={onNavigationStateChange}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}

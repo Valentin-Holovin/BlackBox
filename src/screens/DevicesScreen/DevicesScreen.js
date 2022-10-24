@@ -90,12 +90,6 @@ const DevicesScreen = ({ navigation, userName, password }) => {
     let data = JSON.parse(e.nativeEvent.data);
 
     switch (data.type) {
-      case "buttonDesc":
-        navigation.navigate("View Devices");
-        break;
-      case "buttonChart":
-        navigation.navigate("Raw Data");
-        break;
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
@@ -123,14 +117,14 @@ const DevicesScreen = ({ navigation, userName, password }) => {
     return true;
   };
 
-  const onNavigationStateChange = (navState) => {
-    setIsPostsLoading(true);
-    if (navState.url == LOGIN_URL) {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-    } else {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }
-  };
+  // const onNavigationStateChange = (navState) => {
+  //   setIsPostsLoading(true);
+  //   if (navState.url == LOGIN_URL) {
+  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
+  //   } else {
+  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+  //   }
+  // };
 
   return (
     <ScrollView
@@ -151,7 +145,8 @@ const DevicesScreen = ({ navigation, userName, password }) => {
             nestedScrollEnabled={true}
             source={{ uri: DEVICES_URL }}
             ref={ref}
-            onNavigationStateChange={onNavigationStateChange}
+            injectedJavaScript={INJECTED_JAVASCRIPT}
+            // onNavigationStateChange={onNavigationStateChange}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}

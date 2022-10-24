@@ -12,7 +12,6 @@ import { WebView } from "react-native-webview";
 import { DASHBOARD_URL, LOGIN_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
-import { useCallback } from "react";
 
 const DashboardScreen = ({ navigation, userName, password }) => {
   const [canGoBack, setCanGoBack] = useState(false);
@@ -20,7 +19,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   const ref = useRef(null);
 
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       const handler = () => {
         ref.current.goBack();
         return true;
@@ -37,7 +36,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       if (ref.current) {
         setUrl(DASHBOARD_URL);
         ref.current.reload();
@@ -53,22 +52,33 @@ const DashboardScreen = ({ navigation, userName, password }) => {
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
+
+      document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
+      document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
+      document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
+
       try{
-        document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
-        document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
-        document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
-        document.getElementsByClassName("btn btn-outline-light text-white p-2")[0].removeAttribute("href");
-        document.getElementsByClassName("btn btn-outline-light text-white p-2")[1].removeAttribute("href");
-    
-        for(let i = 0; i < document.getElementsByClassName('btn btn-default').length; i++){
-          document.getElementsByClassName('btn btn-default')[i].addEventListener("click", function(){
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                type: 'buttonReg',
-              })
-            );
-          });
-        }
+        try{
+           document.getElementsByClassName("btn btn-neutral text-dark p-2")[0].addEventListener("click", function(){
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'nextScreen',
+                  link: 'https://www.tanklevels.co.uk/devices/Dw9ZOYM0OQ3g',
+                })
+              );
+            });
+        }catch(e){}
+
+        try{
+          document.querySelectorAll('.btn btn-neutral text-dark p-2 a')[0].addEventListener("click", function(){
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'linkScreen',
+                  link: 'https://www.tanklevels.co.uk/devices/',
+                })
+              );
+            });
+        }catch(e){}
 
         setTimeout(() => {
           window.ReactNativeWebView.postMessage(
@@ -87,26 +97,8 @@ const DashboardScreen = ({ navigation, userName, password }) => {
         }, 700)
       }
 
-    try{
-      document.getElementsByClassName("btn btn-outline-light text-white p-2")[0].addEventListener("click", function(){
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'buttonDesc',
-            })
-          );
-        });
-    }catch(e){}
-
-    try{
-       document.getElementsByClassName("btn btn-outline-light text-white p-2")[1].addEventListener("click", function(){
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'buttonChart',
-            })
-          );
-        });
-    }catch(e){}
-    }, 1500)
+    
+    }, 1000)
   `;
 
   const onScroll = (event) => {
@@ -127,14 +119,16 @@ const DashboardScreen = ({ navigation, userName, password }) => {
       case "buttonDesc":
         navigation.navigate("View Devices");
         break;
-      case "buttonChart":
-        navigation.navigate("Other Devices");
-        break;
-      case "buttonChart":
-        setCanGoBack(true);
-        break;
       case "loadingFinish":
         setIsPostsLoading(false);
+        break;
+      case "nextScreen":
+        setCanGoBack(true);
+        break;
+      case "linkScreen":
+        let link = data.link;
+        console.log("link", link);
+        setCanGoBack(true);
         break;
       default: {
       }
@@ -142,7 +136,6 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   };
 
   const onNavigationStateChange = (navState) => {
-    console.log("navState", navState);
     setIsPostsLoading(true);
     if (navState.url == LOGIN_URL) {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
@@ -151,10 +144,17 @@ const DashboardScreen = ({ navigation, userName, password }) => {
     }
   };
 
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+    }, 700);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <ScrollView
-      // showsHorizontalScrollIndicator={false}
-      // showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
           refreshing={false}
@@ -186,7 +186,8 @@ const DashboardScreen = ({ navigation, userName, password }) => {
             onLoadStart={() => setIsPostsLoading(true)}
             onLoad={() => setIsPostsLoading(false)}
             onScroll={onScroll}
-            style={{ marginBottom: 30 }}
+            incognito={true}
+            style={{ marginBottom: 40 }}
           />
           {isPostsLoading && (
             <ActivityIndicator

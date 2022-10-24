@@ -16,22 +16,19 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
   const ref = useRef(null);
   const [url, setUrl] = useState(DEVICES_URL);
 
-  React.useEffect(() => {
-    BackHandler.removeEventListener("hardwareBackPress", handler);
-    const handler = () => {
-      if (canGoBack) {
+  useFocusEffect(
+    React.useCallback(() => {
+      const handler = () => {
         ref.current.goBack();
-        setCanGoBack(false);
-      } else {
-        navigation.goBack();
-      }
-
-      return true;
-    };
-    BackHandler.addEventListener("hardwareBackPress", handler);
-    navigation.closeDrawer();
-    return () => {};
-  }, [canGoBack]);
+        return true;
+      };
+      BackHandler.addEventListener("hardwareBackPress", handler);
+      navigation.closeDrawer();
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handler);
+      };
+    }, [])
+  );
 
   const [isPostsLoading, setIsPostsLoading] = useState(false);
 
@@ -43,12 +40,6 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
       }
     }, [])
   );
-
-  const INJECTED_JAVASCRIPT_LOGIN = `
-    document.getElementById("Input_Email").value = '${userName}';
-    document.getElementById("Input_Password").value = '${password}';
-    document.getElementsByClassName("btn btn-primary")[0].click();
-  `;
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
@@ -71,6 +62,7 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
 
   const onMessage = (e) => {
     let data = JSON.parse(e.nativeEvent.data);
+
     switch (data.type) {
       case "buttonDesc":
         navigation.navigate("View Devices");
@@ -81,17 +73,14 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
+      case "buttonData":
+        setCanGoBack(true);
+        break;
+      case "buttonReg":
+        setCanGoBack(true);
+        break;
       default: {
       }
-    }
-  };
-
-  const onNavigationStateChange = (navState) => {
-    setIsPostsLoading(true);
-    if (navState.url == LOGIN_URL) {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-    } else {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
     }
   };
 
@@ -105,6 +94,15 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
     }
     return true;
   };
+
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+    }, 700);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <ScrollView
@@ -125,7 +123,7 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
             nestedScrollEnabled={true}
             source={{ uri: DEVICES_URL }}
             ref={ref}
-            onNavigationStateChange={onNavigationStateChange}
+            injectedJavaScript={INJECTED_JAVASCRIPT}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}
