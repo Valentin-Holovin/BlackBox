@@ -8,18 +8,24 @@ import {
 import React, { useRef, useState } from "react";
 import { WebView } from "react-native-webview";
 import { useFocusEffect } from "@react-navigation/native";
-import { DEVICES_URL, LOGIN_URL } from "../../utils/url";
+import { DEVICES_URL, DASHBOARD_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
 
-const ViewDevicesScreen = ({ navigation, userName, password }) => {
+const ViewDevicesScreen = ({ navigation }) => {
   const ref = useRef(null);
-  const [url, setUrl] = useState(DEVICES_URL);
+  const [url, setUrl] = useState(global.URLDEVICE);
+
+  console.log("ViewDevicesScreen =>", global.URLDEVICE);
 
   useFocusEffect(
     React.useCallback(() => {
       const handler = () => {
-        ref.current.goBack();
+        if (global.prevScreen.includes(DASHBOARD_URL)) {
+          navigation.navigate("Dashboard");
+        } else {
+          navigation.navigate("Devices");
+        }
         return true;
       };
       BackHandler.addEventListener("hardwareBackPress", handler);
@@ -35,7 +41,7 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (ref.current) {
-        setUrl(DEVICES_URL);
+        setUrl(global.URLDEVICE);
         ref.current.reload();
       }
     }, [])
@@ -44,9 +50,10 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
       document.getElementsByClassName('col-12 col-lg-6')[0].style.display = "none";
-      document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
-      document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
       document.getElementsByClassName('btn btn-neutral ')[0].style.display = 'none';
+      document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
+      document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
+      document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
   
       setTimeout(() => {
         window.ReactNativeWebView.postMessage(
@@ -54,8 +61,8 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
             type: 'loadingFinish',
           })
         );
-      }, 1500)
-    }, 1500)
+      }, 500)
+    }, 500)
   `;
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
@@ -64,20 +71,8 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
     let data = JSON.parse(e.nativeEvent.data);
 
     switch (data.type) {
-      case "buttonDesc":
-        navigation.navigate("View Devices");
-        break;
-      case "buttonChart":
-        navigation.navigate("Raw Data");
-        break;
       case "loadingFinish":
         setIsPostsLoading(false);
-        break;
-      case "buttonData":
-        setCanGoBack(true);
-        break;
-      case "buttonReg":
-        setCanGoBack(true);
         break;
       default: {
       }
@@ -121,7 +116,7 @@ const ViewDevicesScreen = ({ navigation, userName, password }) => {
         <View style={styles.webview}>
           <WebView
             nestedScrollEnabled={true}
-            source={{ uri: DEVICES_URL }}
+            source={{ uri: global.URLDEVICE }}
             ref={ref}
             injectedJavaScript={INJECTED_JAVASCRIPT}
             tartInLoadingState={true}

@@ -16,7 +16,11 @@ import { connect } from "react-redux";
 const DashboardScreen = ({ navigation, userName, password }) => {
   const [canGoBack, setCanGoBack] = useState(false);
   const [url, setUrl] = useState(DASHBOARD_URL);
+  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
   const ref = useRef(null);
+
+  global.DASHBOARDURL = "https://www.tanklevels.co.uk/dashboard";
 
   useFocusEffect(
     React.useCallback(() => {
@@ -32,17 +36,35 @@ const DashboardScreen = ({ navigation, userName, password }) => {
     }, [])
   );
 
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
-  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+    }, 600);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       if (ref.current) {
+        console.log("DASHBOARD_URL", DASHBOARD_URL);
         setUrl(DASHBOARD_URL);
         ref.current.reload();
       }
     }, [])
   );
+
+  const onScroll = (event) => {
+    setIsScrolledToTop(event.nativeEvent.contentOffset.y < 100);
+  };
+
+  const getRefreshControl = () => {
+    if (!isScrolledToTop) {
+      return false;
+    }
+    return true;
+  };
 
   const INJECTED_JAVASCRIPT_LOGIN = `
     document.getElementById("Input_Email").value ='${userName}';
@@ -58,28 +80,30 @@ const DashboardScreen = ({ navigation, userName, password }) => {
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
 
       try{
-        try{
-           document.getElementsByClassName("btn btn-neutral text-dark p-2")[0].addEventListener("click", function(){
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  type: 'nextScreen',
-                  link: 'https://www.tanklevels.co.uk/devices/Dw9ZOYM0OQ3g',
-                })
-              );
-            });
-        }catch(e){}
+
+        var links = document.getElementsByClassName('btn btn-neutral text-dark p-2');
+          for(var i = 0; i < links.length; i++){
+            if(href != 'javascript:;'){
+              atag.chref=atag.href;
+              atag.href = 'javascript:;';
+              console.log(atag.chref);
+               }
+          }
 
         try{
-          document.querySelectorAll('.btn btn-neutral text-dark p-2 a')[0].addEventListener("click", function(){
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  type: 'linkScreen',
-                  link: 'https://www.tanklevels.co.uk/devices/',
-                })
-              );
-            });
+            document.addEventListener('click', function(evt) {
+              if(('' + evt.target.chref).includes('www.tanklevels.co.uk/devices/')){
+                evt.preventDefault()
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'nextScreen',
+                    link: evt.target.chref,
+                  })
+                );
+           }
+          }, false);
         }catch(e){}
-
+        
         setTimeout(() => {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
@@ -101,34 +125,20 @@ const DashboardScreen = ({ navigation, userName, password }) => {
     }, 1000)
   `;
 
-  const onScroll = (event) => {
-    setIsScrolledToTop(event.nativeEvent.contentOffset.y < 100);
-  };
-
-  const getRefreshControl = () => {
-    if (!isScrolledToTop) {
-      return false;
-    }
-    return true;
-  };
-
   const onMessage = (e) => {
     let data = JSON.parse(e.nativeEvent.data);
 
     switch (data.type) {
-      case "buttonDesc":
-        navigation.navigate("View Devices");
-        break;
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
       case "nextScreen":
-        setCanGoBack(true);
-        break;
-      case "linkScreen":
-        let link = data.link;
-        console.log("link", link);
-        setCanGoBack(true);
+        data.link;
+        global.URLDEVICE = data.link;
+        console.log("LINK", global.URLDEVICE);
+        navigation.navigate("View Devices");
+        global.prevScreen = url;
+        ref.current.clearCache(true);
         break;
       default: {
       }
@@ -143,15 +153,6 @@ const DashboardScreen = ({ navigation, userName, password }) => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
     }
   };
-
-  React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 700);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
 
   return (
     <ScrollView
@@ -180,6 +181,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
             source={{ uri: DASHBOARD_URL }}
             ref={ref}
             onNavigationStateChange={onNavigationStateChange}
+            injectedJavaScript={INJECTED_JAVASCRIPT}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}

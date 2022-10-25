@@ -7,11 +7,11 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { WebView } from "react-native-webview";
-import { DEVICES_URL, LOGIN_URL } from "../../utils/url";
+import { DEVICES_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
 
-const OtherDevicesScreen = ({ navigation, userName, password }) => {
+const OtherDevicesScreen = ({ navigation }) => {
   const ref = useRef(null);
 
   React.useEffect(() => {
@@ -26,13 +26,16 @@ const OtherDevicesScreen = ({ navigation, userName, password }) => {
     };
   }, []);
 
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+    }, 600);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
-  const INJECTED_JAVASCRIPT_LOGIN = `
-    document.getElementById("Input_Email").value = '${userName}';
-    document.getElementById("Input_Password").value = '${password}';
-    document.getElementsByClassName("btn btn-primary")[0].click();
-  `;
+  const [isPostsLoading, setIsPostsLoading] = useState(false);
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
@@ -55,12 +58,6 @@ const OtherDevicesScreen = ({ navigation, userName, password }) => {
   const onMessage = (e) => {
     let data = JSON.parse(e.nativeEvent.data);
     switch (data.type) {
-      case "buttonDesc":
-        navigation.navigate("View Devices");
-        break;
-      case "buttonChart":
-        navigation.navigate("Raw Data");
-        break;
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
@@ -68,15 +65,6 @@ const OtherDevicesScreen = ({ navigation, userName, password }) => {
       }
     }
   };
-
-  // const onNavigationStateChange = (navState) => {
-  //   setIsPostsLoading(true);
-  //   if (navState.url == LOGIN_URL) {
-  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-  //   } else {
-  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-  //   }
-  // };
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 

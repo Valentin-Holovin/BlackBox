@@ -5,13 +5,13 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { WebView } from "react-native-webview";
 import { RAWDATA_URL, LOGIN_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
 
-const RawDataScreen = ({ navigation, userName, password }) => {
+const RawDataScreen = ({ navigation }) => {
   const [canGoBack, setCanGoBack] = useState(false);
   const ref = useRef(null);
 
@@ -35,17 +35,12 @@ const RawDataScreen = ({ navigation, userName, password }) => {
   const [isPostsLoading, setIsPostsLoading] = useState(false);
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
-  const INJECTED_JAVASCRIPT_LOGIN = `
-    document.getElementById("Input_Email").value = '${userName}';
-    document.getElementById("Input_Password").value = '${password}';
-    document.getElementsByClassName("btn btn-primary")[0].click();
-  `;
-
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
       document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
       document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
+
       for(let i = 0; i < document.getElementsByClassName('btn btn-sm btn-default').length; i++){
         document.getElementsByClassName('btn btn-sm btn-default')[i].addEventListener("click", function(){
           window.ReactNativeWebView.postMessage(
@@ -79,7 +74,7 @@ const RawDataScreen = ({ navigation, userName, password }) => {
     return true;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
     }, 500);
@@ -92,29 +87,14 @@ const RawDataScreen = ({ navigation, userName, password }) => {
     let data = JSON.parse(e.nativeEvent.data);
 
     switch (data.type) {
-      case "buttonDesc":
-        navigation.navigate("View Devices");
-        break;
       case "buttonData":
         setCanGoBack(true);
-        break;
-      case "buttonChart":
-        navigation.navigate("Raw Data");
         break;
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
       default: {
       }
-    }
-  };
-
-  const onNavigationStateChange = (navState) => {
-    setIsPostsLoading(true);
-    if (navState.url == LOGIN_URL) {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-    } else {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
     }
   };
 
@@ -138,7 +118,7 @@ const RawDataScreen = ({ navigation, userName, password }) => {
             allowsBackForwardNavigationGestures
             source={{ uri: RAWDATA_URL }}
             ref={ref}
-            onNavigationStateChange={onNavigationStateChange}
+            injectedJavaScript={INJECTED_JAVASCRIPT}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}

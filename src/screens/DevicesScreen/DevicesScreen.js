@@ -7,38 +7,52 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { WebView } from "react-native-webview";
-import { DEVICES_URL, LOGIN_URL } from "../../utils/url";
+import { useFocusEffect } from "@react-navigation/native";
+import { DEVICES_URL } from "../../utils/url";
 import { styles } from "./styles";
 import { connect } from "react-redux";
 
-const DevicesScreen = ({ navigation, userName, password }) => {
+const DevicesScreen = ({ navigation }) => {
   const [canGoBack, setCanGoBack] = useState(false);
+  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+
   const [url, setUrl] = useState(DEVICES_URL);
   const ref = useRef(null);
 
-  React.useEffect(() => {
-    BackHandler.removeEventListener("hardwareBackPress", handler);
-    const handler = () => {
-      if (canGoBack) {
+  useFocusEffect(
+    React.useCallback(() => {
+      const handler = () => {
         ref.current.goBack();
-        setCanGoBack(false);
-      } else {
-        navigation.goBack();
-      }
-      return true;
+        return true;
+      };
+      BackHandler.addEventListener("hardwareBackPress", handler);
+      navigation.closeDrawer();
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handler);
+      };
+    }, [])
+  );
+
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
+    }, 600);
+    return () => {
+      clearInterval(intervalId);
     };
-    BackHandler.addEventListener("hardwareBackPress", handler);
-    navigation.closeDrawer();
-    return () => {};
-  }, [canGoBack]);
+  }, []);
 
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const onScroll = (event) => {
+    setIsScrolledToTop(event.nativeEvent.contentOffset.y < 100);
+  };
 
-  const INJECTED_JAVASCRIPT_LOGIN = `
-    document.getElementById("Input_Email").value = '${userName}';
-    document.getElementById("Input_Password").value = '${password}';
-    document.getElementsByClassName("btn btn-primary")[0].click();
-  `;
+  const getRefreshControl = () => {
+    if (!isScrolledToTop) {
+      return false;
+    }
+    return true;
+  };
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
@@ -77,15 +91,6 @@ const DevicesScreen = ({ navigation, userName, password }) => {
     
   `;
 
-  React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 600);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
   const onMessage = (e) => {
     let data = JSON.parse(e.nativeEvent.data);
 
@@ -103,28 +108,6 @@ const DevicesScreen = ({ navigation, userName, password }) => {
       }
     }
   };
-
-  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
-
-  const onScroll = (event) => {
-    setIsScrolledToTop(event.nativeEvent.contentOffset.y < 100);
-  };
-
-  const getRefreshControl = () => {
-    if (!isScrolledToTop) {
-      return false;
-    }
-    return true;
-  };
-
-  // const onNavigationStateChange = (navState) => {
-  //   setIsPostsLoading(true);
-  //   if (navState.url == LOGIN_URL) {
-  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT_LOGIN);
-  //   } else {
-  //     ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-  //   }
-  // };
 
   return (
     <ScrollView
@@ -146,7 +129,6 @@ const DevicesScreen = ({ navigation, userName, password }) => {
             source={{ uri: DEVICES_URL }}
             ref={ref}
             injectedJavaScript={INJECTED_JAVASCRIPT}
-            // onNavigationStateChange={onNavigationStateChange}
             tartInLoadingState={true}
             javaScriptEnabled={true}
             onMessage={onMessage}
