@@ -20,8 +20,6 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
   const ref = useRef(null);
 
-  global.DASHBOARDURL = "https://www.tanklevels.co.uk/dashboard";
-
   useFocusEffect(
     React.useCallback(() => {
       const handler = () => {
@@ -82,27 +80,30 @@ const DashboardScreen = ({ navigation, userName, password }) => {
       try{
 
         var links = document.getElementsByClassName('btn btn-neutral text-dark p-2');
+        for(var i = 0; i < links.length; i++){
           for(var i = 0; i < links.length; i++){
-            if(href != 'javascript:;'){
-              atag.chref=atag.href;
-              atag.href = 'javascript:;';
-              console.log(atag.chref);
-               }
+          let atag = links[i];
+          if(atag.href != 'javascript:;'){
+            atag.chref=atag.href;
+            atag.href = 'javascript:;';
+            console.log(atag.chref);
           }
+          }
+        }
 
-        try{
-            document.addEventListener('click', function(evt) {
-              if(('' + evt.target.chref).includes('www.tanklevels.co.uk/devices/')){
-                evt.preventDefault()
-                window.ReactNativeWebView.postMessage(
-                  JSON.stringify({
-                    type: 'nextScreen',
-                    link: evt.target.chref,
-                  })
-                );
-           }
-          }, false);
-        }catch(e){}
+      try{
+          document.addEventListener('click', function(evt) {
+            if(('' + evt.target.chref).includes('www.tanklevels.co.uk/devices/')){
+              evt.preventDefault()
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'nextScreen',
+                  link: evt.target.chref,
+                })
+              );
+         }
+        }, false);
+      }catch(e){}
         
         setTimeout(() => {
           window.ReactNativeWebView.postMessage(
@@ -120,9 +121,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
           );
         }, 700)
       }
-
-    
-    }, 1000)
+    }, 1500)
   `;
 
   const onMessage = (e) => {
@@ -136,9 +135,8 @@ const DashboardScreen = ({ navigation, userName, password }) => {
         data.link;
         global.URLDEVICE = data.link;
         console.log("LINK", global.URLDEVICE);
-        navigation.navigate("View Devices");
         global.prevScreen = url;
-        ref.current.clearCache(true);
+        navigation.navigate("View Devices");
         break;
       default: {
       }

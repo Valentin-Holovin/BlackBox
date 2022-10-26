@@ -20,12 +20,9 @@ const AboutScreen = ({ navigation }) => {
   React.useEffect(() => {
     BackHandler.removeEventListener("hardwareBackPress", handler);
     const handler = () => {
-      if (canGoBack) {
-        ref.current.goBack();
-        setCanGoBack(false);
-      } else {
-        navigation.goBack();
-      }
+      ref.current.goBack();
+      setCanGoBack(false);
+
       return true;
     };
     BackHandler.addEventListener("hardwareBackPress", handler);

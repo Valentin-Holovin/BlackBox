@@ -16,7 +16,7 @@ const ViewDevicesScreen = ({ navigation }) => {
   const ref = useRef(null);
   const [url, setUrl] = useState(global.URLDEVICE);
 
-  console.log("ViewDevicesScreen =>", global.URLDEVICE);
+  console.log("ViewDevicesScreen", global.URLDEVICE);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -42,6 +42,7 @@ const ViewDevicesScreen = ({ navigation }) => {
     React.useCallback(() => {
       if (ref.current) {
         setUrl(global.URLDEVICE);
+        console.log("ViewDevicesScreen", global.URLDEVICE);
         ref.current.reload();
       }
     }, [])
@@ -49,11 +50,11 @@ const ViewDevicesScreen = ({ navigation }) => {
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
-      document.getElementsByClassName('col-12 col-lg-6')[0].style.display = "none";
       document.getElementsByClassName('btn btn-neutral ')[0].style.display = 'none';
       document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
       document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
+
   
       setTimeout(() => {
         window.ReactNativeWebView.postMessage(
@@ -61,8 +62,8 @@ const ViewDevicesScreen = ({ navigation }) => {
             type: 'loadingFinish',
           })
         );
-      }, 500)
-    }, 500)
+      }, 700)
+    }, 1500)
   `;
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
@@ -93,7 +94,7 @@ const ViewDevicesScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 700);
+    }, 600);
     return () => {
       clearInterval(intervalId);
     };

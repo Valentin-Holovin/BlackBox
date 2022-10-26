@@ -79,7 +79,7 @@ const MyDrawer = () => {
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Devices" component={DevicesScreen} />
       <Drawer.Screen name="Raw Data" component={RawDataScreen} />
-      <Drawer.Screen name="GDPR" component={AboutScreen} />
+      <Drawer.Screen name="How to use" component={AboutScreen} />
 
       <Drawer.Screen
         name="Other Devices"

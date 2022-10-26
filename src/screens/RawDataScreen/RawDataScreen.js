@@ -16,14 +16,9 @@ const RawDataScreen = ({ navigation }) => {
   const ref = useRef(null);
 
   React.useEffect(() => {
-    BackHandler.removeEventListener("hardwareBackPress", handler);
     const handler = () => {
-      if (canGoBack) {
-        ref.current.goBack();
-        setCanGoBack(false);
-      } else {
-        navigation.goBack();
-      }
+      ref.current.goBack();
+      setCanGoBack(false);
 
       return true;
     };

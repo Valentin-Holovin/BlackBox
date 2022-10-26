@@ -47,6 +47,16 @@ const DevicesScreen = ({ navigation }) => {
     setIsScrolledToTop(event.nativeEvent.contentOffset.y < 100);
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (ref.current) {
+        console.log("DEVICES_URL", DEVICES_URL);
+        setUrl(DEVICES_URL);
+        ref.current.reload();
+      }
+    }, [])
+  );
+
   const getRefreshControl = () => {
     if (!isScrolledToTop) {
       return false;
@@ -60,15 +70,32 @@ const DevicesScreen = ({ navigation }) => {
       document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
 
-      for(let i = 0; i < document.getElementsByClassName('btn btn-sm btn-default').length; i++){
-        document.getElementsByClassName('btn btn-sm btn-default')[i].addEventListener("click", function(){
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'buttonData',
-            })
-          );
-        });
-      }
+
+      var links = document.getElementsByClassName('btn btn-sm btn-default');
+        for(var i = 0; i < links.length; i++){
+          for(var i = 0; i < links.length; i++){
+          let atag = links[i];
+          if(atag.href != 'javascript:;'){
+            atag.chref=atag.href;
+            atag.href = 'javascript:;';
+            console.log(atag.chref);
+          }
+          }
+        }
+
+      try{
+        document.addEventListener('click', function(evt) {
+          if(('' + evt.target.chref).includes('www.tanklevels.co.uk/devices/')){
+            evt.preventDefault()
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: 'nextScreen',
+                link: evt.target.chref,
+              })
+            );
+       }
+      }, false);
+    }catch(e){}
       
       for(let i = 0; i < document.getElementsByClassName('btn btn-neutral').length; i++){
         document.getElementsByClassName('btn btn-neutral')[i].addEventListener("click", function(){
@@ -98,8 +125,12 @@ const DevicesScreen = ({ navigation }) => {
       case "loadingFinish":
         setIsPostsLoading(false);
         break;
-      case "buttonData":
-        setCanGoBack(true);
+      case "nextScreen":
+        data.link;
+        global.URLDEVICE = data.link;
+        console.log("LINK", global.URLDEVICE);
+        navigation.navigate("View Devices");
+        global.prevScreen = DEVICES_URL;
         break;
       case "buttonReg":
         setCanGoBack(true);
