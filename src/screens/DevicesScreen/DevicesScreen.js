@@ -20,6 +20,8 @@ const DevicesScreen = ({ navigation }) => {
   const [url, setUrl] = useState(DEVICES_URL);
   const ref = useRef(null);
 
+  global.DEVICENAME = "";
+
   useFocusEffect(
     React.useCallback(() => {
       const handler = () => {

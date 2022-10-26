@@ -95,7 +95,7 @@ const MyDrawer = () => {
         component={ViewDevicesScreen}
         options={{
           drawerLabel: () => null,
-          title: null,
+          title: global.DEVICENAME,
           drawerItemStyle: { height: 0 },
         }}
       />

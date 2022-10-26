@@ -86,6 +86,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
           if(atag.href != 'javascript:;'){
             atag.chref=atag.href;
             atag.href = 'javascript:;';
+            atag.cName=atag.innerText;
             console.log(atag.chref);
           }
           }
@@ -99,6 +100,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
                 JSON.stringify({
                   type: 'nextScreen',
                   link: evt.target.chref,
+                  name: evt.target.cName,
                 })
               );
          }
@@ -136,6 +138,9 @@ const DashboardScreen = ({ navigation, userName, password }) => {
         global.URLDEVICE = data.link;
         console.log("LINK", global.URLDEVICE);
         global.prevScreen = url;
+        data.name;
+        global.DEVICENAME = data.name;
+        console.log("Name => ", data.name);
         navigation.navigate("View Devices");
         break;
       default: {
