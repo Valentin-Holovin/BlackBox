@@ -54,7 +54,7 @@ const RawDataScreen = ({ navigation }) => {
           })
         );
       }, 500)
-    }, 1000)
+    }, 600)
     
   `;
 
@@ -72,7 +72,7 @@ const RawDataScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 500);
+    }, 300);
     return () => {
       clearInterval(intervalId);
     };

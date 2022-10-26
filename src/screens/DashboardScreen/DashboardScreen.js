@@ -37,7 +37,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 600);
+    }, 300);
     return () => {
       clearInterval(intervalId);
     };
@@ -121,7 +121,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
           );
         }, 700)
       }
-    }, 1500)
+    }, 600)
   `;
 
   const onMessage = (e) => {

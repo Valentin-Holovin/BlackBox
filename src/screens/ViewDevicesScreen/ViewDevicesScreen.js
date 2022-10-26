@@ -63,7 +63,7 @@ const ViewDevicesScreen = ({ navigation }) => {
           })
         );
       }, 700)
-    }, 1500)
+    }, 600)
   `;
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
@@ -94,7 +94,7 @@ const ViewDevicesScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 600);
+    }, 300);
     return () => {
       clearInterval(intervalId);
     };
