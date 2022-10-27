@@ -54,7 +54,7 @@ const RawDataScreen = ({ navigation }) => {
           })
         );
       }, 500)
-    }, 1000)
+    }, 1200)
     
   `;
 

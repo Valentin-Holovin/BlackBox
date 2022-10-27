@@ -16,8 +16,6 @@ const ViewDevicesScreen = ({ navigation }) => {
   const ref = useRef(null);
   const [url, setUrl] = useState(global.URLDEVICE);
 
-  console.log("ViewDevicesScreen", global.URLDEVICE);
-
   useFocusEffect(
     React.useCallback(() => {
       const handler = () => {
@@ -42,7 +40,6 @@ const ViewDevicesScreen = ({ navigation }) => {
     React.useCallback(() => {
       if (ref.current) {
         setUrl(global.URLDEVICE);
-        console.log("ViewDevicesScreen", global.URLDEVICE);
         ref.current.reload();
       }
     }, [])
@@ -63,7 +60,7 @@ const ViewDevicesScreen = ({ navigation }) => {
           })
         );
       }, 700)
-    }, 1000)
+    }, 1200)
   `;
 
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);

@@ -46,7 +46,6 @@ const DashboardScreen = ({ navigation, userName, password }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (ref.current) {
-        console.log("DASHBOARD_URL", DASHBOARD_URL);
         setUrl(DASHBOARD_URL);
         ref.current.reload();
       }
@@ -87,7 +86,6 @@ const DashboardScreen = ({ navigation, userName, password }) => {
             atag.chref=atag.href;
             atag.href = 'javascript:;';
             atag.cName=atag.innerText;
-            console.log(atag.chref);
           }
           }
         }
@@ -123,7 +121,7 @@ const DashboardScreen = ({ navigation, userName, password }) => {
           );
         }, 700)
       }
-    }, 1000)
+    }, 1200)
   `;
 
   const onMessage = (e) => {
@@ -136,11 +134,9 @@ const DashboardScreen = ({ navigation, userName, password }) => {
       case "nextScreen":
         data.link;
         global.URLDEVICE = data.link;
-        console.log("LINK", global.URLDEVICE);
         global.prevScreen = url;
         data.name;
         global.DEVICENAME = data.name;
-        console.log("Name => ", data.name);
         navigation.navigate("View Devices");
         break;
       default: {
