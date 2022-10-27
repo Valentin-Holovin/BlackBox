@@ -39,7 +39,7 @@ const DevicesScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 300);
+    }, 500);
     return () => {
       clearInterval(intervalId);
     };
@@ -116,7 +116,7 @@ const DevicesScreen = ({ navigation }) => {
           })
         );
       }, 600)
-    }, 600)
+    }, 1000)
     
   `;
 
