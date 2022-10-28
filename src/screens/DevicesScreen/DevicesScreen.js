@@ -84,7 +84,7 @@ const DevicesScreen = ({ navigation }) => {
         
         try{
           document.addEventListener('click', function(evt) {
-            if(('' + evt.target.chref).includes('www.tanklevels.co.uk/devices/')){
+            if(('' + evt.target.chref).includes('/devices/')){
               evt.preventDefault()
               window.ReactNativeWebView.postMessage(
                 JSON.stringify({
@@ -130,6 +130,7 @@ const DevicesScreen = ({ navigation }) => {
         data.link;
         global.URLDEVICE = data.link;
         global.prevScreen = DEVICES_URL;
+        console.log("LINK", URLDEVICE);
         break;
       case "buttonReg":
         setCanGoBack(true);
