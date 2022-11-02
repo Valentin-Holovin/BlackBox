@@ -49,7 +49,7 @@ const AboutScreen = ({ navigation }) => {
         document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
         document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
       
-      }, 1000)
+      }, 1500)
     `;
 
   const onScroll = (event) => {

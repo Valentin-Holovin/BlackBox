@@ -47,7 +47,16 @@ const ViewDevicesScreen = ({ navigation }) => {
 
   const INJECTED_JAVASCRIPT = `
     setTimeout(() => {
-      document.getElementsByClassName('btn btn-neutral ')[0].style.display = 'none';
+      var names = document.getElementsByClassName('btn btn-neutral mb-2');
+        for(var i = 0; i < names.length; i++){
+          for(var i = 0; i < names.length; i++){
+          let atag = names[i];
+              console.log(atag.innerText);
+          if(!atag.innerText.includes('Device Settings') && !atag.innerText.includes('Edit Device')){
+              atag.style.display = 'none';
+          }
+          }
+        }
       document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
       document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';

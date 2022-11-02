@@ -39,7 +39,7 @@ const DevicesScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 600);
+    }, 500);
     return () => {
       clearInterval(intervalId);
     };
@@ -66,11 +66,12 @@ const DevicesScreen = ({ navigation }) => {
   };
 
   const INJECTED_JAVASCRIPT = `
-    setTimeout(() => {
+  setTimeout(() => {
       document.getElementsByClassName("navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")[0].style.display = "none";
       document.getElementsByClassName('breadcrumb breadcrumb-links breadcrumb-dark')[0].style.display = 'none';
       document.getElementsByClassName('footer pt-0')[0].style.display = 'none';
 
+      var load = function () {
         var links = document.getElementsByClassName('btn btn-sm btn-default');
         for(var i = 0; i < links.length; i++){
           for(var i = 0; i < links.length; i++){
@@ -95,6 +96,15 @@ const DevicesScreen = ({ navigation }) => {
           }
           }, false);
         }catch(e){}
+      };
+      
+      if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', load); // Document still loading so DomContentLoaded can still fire :)
+      } else {
+        load();
+      }
+
+        
       
       for(let i = 0; i < document.getElementsByClassName('btn btn-neutral').length; i++){
         document.getElementsByClassName('btn btn-neutral')[i].addEventListener("click", function(){
@@ -113,8 +123,7 @@ const DevicesScreen = ({ navigation }) => {
           })
         );
       }, 500)
-    }, 1000)
-    
+    }, 1500)
   `;
 
   const onMessage = (e) => {
@@ -134,6 +143,12 @@ const DevicesScreen = ({ navigation }) => {
         break;
       case "buttonReg":
         setCanGoBack(true);
+        break;
+      case "DOM":
+        console.log("NAME", data.name);
+        break;
+      case "LOADING":
+        console.log("LOADING", data.name);
         break;
       default: {
       }
