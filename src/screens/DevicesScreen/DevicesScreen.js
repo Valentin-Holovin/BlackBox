@@ -39,7 +39,7 @@ const DevicesScreen = ({ navigation }) => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       ref.current.injectJavaScript(INJECTED_JAVASCRIPT);
-    }, 500);
+    }, 600);
     return () => {
       clearInterval(intervalId);
     };
@@ -123,7 +123,7 @@ const DevicesScreen = ({ navigation }) => {
           })
         );
       }, 500)
-    }, 1500)
+    }, 1600)
   `;
 
   const onMessage = (e) => {
@@ -134,21 +134,13 @@ const DevicesScreen = ({ navigation }) => {
         setIsPostsLoading(false);
         break;
       case "nextScreen":
-        console.log("nextScreen");
         navigation.navigate("View Devices");
         data.link;
         global.URLDEVICE = data.link;
         global.prevScreen = DEVICES_URL;
-        console.log("LINK", URLDEVICE);
         break;
       case "buttonReg":
         setCanGoBack(true);
-        break;
-      case "DOM":
-        console.log("NAME", data.name);
-        break;
-      case "LOADING":
-        console.log("LOADING", data.name);
         break;
       default: {
       }
